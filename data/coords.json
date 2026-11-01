@@ -1,0 +1,162 @@
+{
+ "angamos": {
+  "lat": -12.11134,
+  "lon": -77.01275,
+  "precision": "consulta"
+ },
+ "arequipa-cayma": {
+  "lat": -16.38969,
+  "lon": -71.54755,
+  "precision": "consulta"
+ },
+ "arequipa-porongoche": {
+  "lat": -16.42109,
+  "lon": -71.47493,
+  "precision": "ciudad"
+ },
+ "atocongo": {
+  "lat": -12.14742,
+  "lon": -76.98098,
+  "precision": "consulta"
+ },
+ "bellavista": {
+  "lat": -12.05623,
+  "lon": -77.10193,
+  "precision": "consulta"
+ },
+ "cajamarca": {
+  "lat": -7.15667,
+  "lon": -78.51731,
+  "precision": "ciudad"
+ },
+ "canete": {
+  "lat": -13.07777,
+  "lon": -76.38745,
+  "precision": "ciudad"
+ },
+ "centro-civico": {
+  "lat": -12.04996,
+  "lon": -77.02914,
+  "precision": "ciudad"
+ },
+ "chiclayo": {
+  "lat": -6.77161,
+  "lon": -79.83872,
+  "precision": "ciudad"
+ },
+ "chimbote": {
+  "lat": -9.10171,
+  "lon": -78.55765,
+  "precision": "consulta"
+ },
+ "comas": {
+  "lat": -11.93286,
+  "lon": -77.04067,
+  "precision": "ciudad"
+ },
+ "cusco": {
+  "lat": -13.5258,
+  "lon": -71.95072,
+  "precision": "consulta"
+ },
+ "huancayo": {
+  "lat": -12.0681,
+  "lon": -75.2101,
+  "precision": "ciudad"
+ },
+ "huanuco": {
+  "lat": -9.93849,
+  "lon": -76.24757,
+  "precision": "consulta"
+ },
+ "ica": {
+  "lat": -14.07014,
+  "lon": -75.72817,
+  "precision": "consulta"
+ },
+ "iquitos": {
+  "lat": -3.74937,
+  "lon": -73.24441,
+  "precision": "ciudad"
+ },
+ "jockey-plaza": {
+  "lat": -12.08491,
+  "lon": -76.97575,
+  "precision": "consulta"
+ },
+ "lima-centro": {
+  "lat": -12.04849,
+  "lon": -77.03308,
+  "precision": "consulta"
+ },
+ "mall-del-sur": {
+  "lat": -12.15539,
+  "lon": -76.97244,
+  "precision": "ciudad"
+ },
+ "megaplaza": {
+  "lat": -11.99444,
+  "lon": -77.0611,
+  "precision": "consulta"
+ },
+ "miraflores": {
+  "lat": -12.11872,
+  "lon": -77.02953,
+  "precision": "consulta"
+ },
+ "piura-centro": {
+  "lat": -5.19752,
+  "lon": -80.62786,
+  "precision": "consulta"
+ },
+ "piura-mall": {
+  "lat": -5.11161,
+  "lon": -80.53545,
+  "precision": "ciudad"
+ },
+ "plaza-norte": {
+  "lat": -12.00625,
+  "lon": -77.05877,
+  "precision": "consulta"
+ },
+ "pucallpa": {
+  "lat": -8.38768,
+  "lon": -74.56656,
+  "precision": "consulta"
+ },
+ "puruchuco": {
+  "lat": -12.04085,
+  "lon": -76.93224,
+  "precision": "consulta"
+ },
+ "salaverry": {
+  "lat": -12.07819,
+  "lon": -77.0464,
+  "precision": "ciudad"
+ },
+ "san-isidro": {
+  "lat": -12.09504,
+  "lon": -77.02507,
+  "precision": "consulta"
+ },
+ "san-miguel": {
+  "lat": -12.07694,
+  "lon": -77.08272,
+  "precision": "consulta"
+ },
+ "santa-anita": {
+  "lat": -12.05629,
+  "lon": -76.97105,
+  "precision": "consulta"
+ },
+ "tacna": {
+  "lat": -18.01386,
+  "lon": -70.2511,
+  "precision": "ciudad"
+ },
+ "trujillo": {
+  "lat": -8.11168,
+  "lon": -79.02877,
+  "precision": "ciudad"
+ }
+}
