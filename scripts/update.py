@@ -96,7 +96,8 @@ def clima(stores, coords):
                 "longitude": ",".join(str(coords[s["id"]]["lon"]) for s in lote),
                 "hourly": "precipitation,precipitation_probability,wind_gusts_10m,weather_code,cape",
                 "current": "temperature_2m,precipitation,wind_gusts_10m,weather_code",
-                "wind_speed_unit": "kmh", "forecast_days": 2, "timezone": "America/Lima",
+                "daily": "precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,weather_code",
+                "wind_speed_unit": "kmh", "past_days": 7, "forecast_days": 4, "timezone": "America/Lima",
             })
             data = json.loads(http_get("https://api.open-meteo.com/v1/forecast?" + q))
             if isinstance(data, dict):
@@ -109,7 +110,23 @@ def clima(stores, coords):
                 num = lambda arr: [x or 0 for x in arr[sl]]  # noqa: E731
                 pr, pb, gu, wc, ca = (num(h["precipitation"]), num(h["precipitation_probability"]),
                                       num(h["wind_gusts_10m"]), num(h["weather_code"]), num(h["cape"]))
+                dd = d["daily"]
+                hoy = now.strftime("%Y-%m-%d")
+                di = dd["time"].index(hoy) if hoy in dd["time"] else 7
+                acum7 = round(sum((x or 0) for x in dd["precipitation_sum"][max(0, di - 7):di]), 1)
+                etiquetas = ["Hoy", "Mañana", "Pasado mañana"]
+                dias = []
+                for k in range(3):
+                    j = di + k
+                    if j >= len(dd["time"]):
+                        break
+                    dias.append({"fecha": dd["time"][j], "etiqueta": etiquetas[k],
+                                 "mm": round(dd["precipitation_sum"][j] or 0, 1),
+                                 "prob": dd["precipitation_probability_max"][j],
+                                 "rafaga_kmh": round(dd["wind_gusts_10m_max"][j] or 0),
+                                 "tormenta": (dd["weather_code"][j] or 0) in (95, 96, 99)})
                 out[s["id"]] = {
+                    "acum_7d_mm": acum7, "dias": dias,
                     "mm_24h": round(sum(pr), 1), "mm_6h": round(sum(pr[:6]), 1),
                     "mm_ahora": round(cur.get("precipitation") or 0, 1),
                     "prob_max_24h": max(pb) if pb else None,
@@ -236,6 +253,8 @@ def evaluar(s, c, apto, sis_cerca, um):
             sube(2, f"Ráfagas de hasta {g} km/h")
         elif g >= u["medio_viento"]:
             sube(1, f"Ráfagas de hasta {g} km/h")
+        if c.get("acum_7d_mm", 0) >= u["acum7_alerta"] and mm24 >= u["medio_mm24"]:
+            sube(2, f"Suelo ya saturado: {c['acum_7d_mm']} mm en los últimos 7 días")
     if apto and apto["km"] <= um["aeropuerto_radio_km"] and apto.get("obs"):
         o = apto["obs"]
         if o["tormenta"]:
@@ -263,6 +282,67 @@ def evaluar(s, c, apto, sis_cerca, um):
     return nivel, [m[1] for m in motivos], flags
 
 
+def nivel_dia(s, d, um):
+    """Nivel de riesgo de un dia futuro (solo por lluvia, viento y tormenta del pronostico diario)."""
+    u = um["costa"] if s["zona"] in um["zonas_costa"] else um["andes_selva"]
+    n = 0
+    if d["mm"] >= u["critico_mm24"]:
+        n = 3
+    elif d["mm"] >= u["alto_mm24"]:
+        n = 2
+    elif d["mm"] >= u["medio_mm24"]:
+        n = 1
+    if d["tormenta"]:
+        n = max(n, 2)
+    if d["rafaga_kmh"] >= u["critico_viento"]:
+        n = max(n, 3)
+    elif d["rafaga_kmh"] >= u["alto_viento"]:
+        n = max(n, 2)
+    elif d["rafaga_kmh"] >= u["medio_viento"]:
+        n = max(n, 1)
+    return n
+
+
+def hora_txt(h):
+    h = int(h) % 24
+    return f"{h % 12 or 12} {'am' if h < 12 else 'pm'}"
+
+
+def frase_simple(nivel, c, flags, dias):
+    """Frase corta en lenguaje simple para el gerente de tienda."""
+    if nivel is None:
+        return "Sin datos en esta actualización. Consulta SENAMHI antes de decidir."
+    partes = []
+    if c:
+        horas = c["horas"]
+        llueve = [k for k, x in enumerate(horas) if x["mm"] >= 0.3]
+        if flags.get("lloviendo"):
+            partes.append("Está lloviendo ahora.")
+        if llueve:
+            ini, fin = horas[llueve[0]]["h"], (int(horas[llueve[-1]]["h"]) + 1) % 24
+            ventana = (f"entre las {hora_txt(ini)} y las {hora_txt(fin)}" if llueve[0] != llueve[-1]
+                       else f"alrededor de las {hora_txt(ini)}")
+            fuerza = "muy fuerte" if nivel >= 3 else "fuerte" if nivel == 2 else "ligera a moderada"
+            tor = " con tormenta eléctrica" if flags.get("tormenta") else ""
+            partes.append(f"Lluvia {fuerza}{tor} {ventana}.")
+        elif (c.get("prob_max_24h") or 0) >= 60:
+            partes.append(f"Posible lluvia en las próximas 24 horas (probabilidad {c['prob_max_24h']}%).")
+        if flags.get("viento") and c.get("rafaga_max_kmh"):
+            partes.append(f"Ráfagas de hasta {c['rafaga_max_kmh']} km/h.")
+    accion = {3: "Activa el plan de contingencia ahora.",
+              2: "Haz la revisión preventiva de techos, canaletas y sumideros antes de la lluvia.",
+              1: "Mantente atento a los cambios en las próximas horas.",
+              0: "Sin riesgo relevante por ahora. Mantén el monitoreo normal."}[nivel]
+    if nivel == 0 and not partes:
+        partes.append(accion)
+    else:
+        partes.append(accion)
+    prox = [f"{d['etiqueta'].lower()}: riesgo {NIVELES[d['nivel']].lower()}" for d in (dias or [])[1:] if d["nivel"] >= 2]
+    if prox:
+        partes.append("Atención en los próximos días: " + "; ".join(prox) + ".")
+    return " ".join(partes)
+
+
 def aeropuerto_cercano(lat, lon, obs):
     mejor = None
     for o in obs.values():
@@ -286,7 +366,12 @@ def demo_fuentes(stores, coords):
                        "rafaga_max_kmh": random.randint(15, 80), "rafaga_ahora_kmh": random.randint(5, 40),
                        "temp_c": random.randint(14, 30), "cape_max": random.randint(0, 1500),
                        "tormenta_6h": random.random() < .12, "tormenta_24h": random.random() < .25,
-                       "granizo_24h": random.random() < .1, "codigo_ahora": 3, "horas": horas}
+                       "granizo_24h": random.random() < .1, "codigo_ahora": 3, "horas": horas,
+                       "acum_7d_mm": random.choice([0, 1.2, 4, 12, 40]),
+                       "dias": [{"fecha": "2026-11-01", "etiqueta": e, "mm": random.choice([0, 0.5, 6, 18, 40]),
+                                 "prob": random.randint(0, 95), "rafaga_kmh": random.randint(15, 80),
+                                 "tormenta": random.random() < .15}
+                                for e in ("Hoy", "Mañana", "Pasado mañana")]}
     ob = {}
     for k, (n, la, lo) in {"SPJC": ("Jorge Chávez, Lima", -12.02, -77.11), "SPUR": ("Piura", -5.21, -80.62),
                            "SPHI": ("Chiclayo", -6.79, -79.83), "SPRU": ("Trujillo", -8.08, -79.11),
@@ -344,6 +429,10 @@ def main():
             n, mot, fl = evaluar(s, t["clima"], apto, cerca, um)
             t["nivel"], t["motivos"], t["flags"] = n, mot, fl
         t["nivel_txt"] = NIVELES[t["nivel"]] if t["nivel"] is not None else "Sin datos"
+        if t["clima"]:
+            for d in t["clima"]["dias"]:
+                d["nivel"] = nivel_dia(s, d, um)
+        t["frase"] = frase_simple(t["nivel"], t["clima"], t["flags"], t["clima"]["dias"] if t["clima"] else [])
         tiendas.append(t)
 
     cuenta = {k: sum(1 for t in tiendas if t["nivel"] == i) for i, k in enumerate(NIVELES)}

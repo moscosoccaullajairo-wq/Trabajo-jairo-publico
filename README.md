@@ -8,7 +8,10 @@ Página pública que se actualiza sola cada 2 horas. Muestra, por tienda y por z
 - Sismos M4.0+ de las últimas 24 h y cuáles están cerca de cada tienda (USGS)
 - Boletines de tsunami del Pacífico (NOAA/PTWC)
 - Estado de El Niño costero según el último comunicado ENFEN
-- Plan de acción sugerido por nivel y botón para copiar un resumen para WhatsApp
+- Frase simple para el gerente de tienda, pronóstico de 3 días y lluvia acumulada de 7 días
+- Plan de acción sugerido por nivel, en fases (antes, durante y después), con responsable por acción
+- Enlace y QR por tienda (`?t=id`), que abre solo la ficha de esa tienda
+- Botón para copiar un resumen para WhatsApp
 
 No usa IA ni consume tokens: es un script que corre en GitHub.
 
@@ -33,6 +36,10 @@ No usa IA ni consume tokens: es un script que corre en GitHub.
 - No hay fuente gratuita y oficial de descargas eléctricas en vivo para Perú. La tormenta eléctrica es probable según el pronóstico y las observaciones de aeropuertos.
 - Tornados: casi no ocurren en Perú y no hay fuente oficial. Se muestran ráfagas fuertes y granizo.
 - Avisos de SENAMHI, INDECI/COEN y huaicos o desborde de ríos: solo enlaces. No hay datos que se puedan leer de forma automática.
+
+## Qué no subir a este repositorio
+
+Este repositorio es público. No pongas aquí nombres, teléfonos de guardia, contratistas, análisis de vulnerabilidad por tienda ni datos de Faldama o SAP. Los roles de `data/acciones.json` deben ser genéricos.
 
 ## Aviso
 

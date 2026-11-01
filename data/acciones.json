@@ -1,27 +1,54 @@
 {
-  "_nota": "BORRADOR para validar por Mantenimiento y Prevencion. Se puede editar libremente. Cada nivel lista acciones por sistema.",
-  "3": [
-    {"sistema": "Comunicación", "accion": "Avisar al gerente de tienda y activar al responsable de contingencia. Informar a Mantenimiento corporativo."},
-    {"sistema": "Techos y drenaje", "accion": "Revisar techos, canaletas, sumideros y bajantes antes de que llegue la lluvia. Despejar hojas y residuos."},
-    {"sistema": "Techos y drenaje", "accion": "Verificar bombas de achique, sótanos y zonas bajas. Retirar mercadería y equipos del piso en zonas inundables."},
-    {"sistema": "Energía", "accion": "Confirmar combustible y arranque del grupo electrógeno. Revisar UPS y tableros críticos."},
-    {"sistema": "HVAC", "accion": "Proteger unidades exteriores y revisar que las tomas de aire y los drenajes no se obstruyan."},
-    {"sistema": "Transporte vertical", "accion": "Evaluar el uso de ascensores y escaleras en niveles bajos si hay riesgo de ingreso de agua."},
-    {"sistema": "ACI", "accion": "Confirmar que el sistema contraincendios y el tanque de agua estén operativos."},
-    {"sistema": "Contratistas", "accion": "Dejar avisados a las contratas de guardia (eléctrico, HVAC, ascensores, impermeabilización)."},
-    {"sistema": "Personas", "accion": "Restringir accesos a zonas inundables o con riesgo de caída de elementos. Registrar cada incidencia en Faldama."}
-  ],
-  "2": [
-    {"sistema": "Techos y drenaje", "accion": "Inspección preventiva de techos, canaletas y sumideros durante el día."},
-    {"sistema": "Energía", "accion": "Probar el grupo electrógeno y revisar tableros críticos."},
-    {"sistema": "Contratistas", "accion": "Avisar a las contratas para atención rápida de correctivos."},
-    {"sistema": "Comunicación", "accion": "Informar al gerente de tienda el nivel de riesgo y dejar un punto de contacto de guardia."}
-  ],
-  "1": [
-    {"sistema": "Monitoreo", "accion": "Seguimiento en este tablero cada 2 horas."},
-    {"sistema": "Techos y drenaje", "accion": "Verificar que sumideros y canaletas estén despejados."}
-  ],
-  "0": [
-    {"sistema": "Monitoreo", "accion": "Sin acciones adicionales. Mantener el monitoreo normal."}
-  ]
+  "_nota": "BORRADOR para validar por Mantenimiento y Prevencion. Editable. Cada nivel tiene tres fases: antes, durante y despues. Los responsables son roles genericos (esta pagina es publica: no poner nombres ni telefonos).",
+  "3": {
+    "antes": [
+      {"sistema": "Comunicación", "responsable": "Gerente de tienda", "accion": "Activar el plan de contingencia, avisar al equipo y a Mantenimiento corporativo."},
+      {"sistema": "Techos y drenaje", "responsable": "Mantenimiento de tienda", "accion": "Revisar techos, canaletas, sumideros y bajantes. Despejar hojas y residuos."},
+      {"sistema": "Techos y drenaje", "responsable": "Mantenimiento de tienda", "accion": "Verificar bombas de achique, sótanos y zonas bajas. Retirar mercadería y equipos del piso en zonas inundables."},
+      {"sistema": "Energía", "responsable": "Mantenimiento de tienda", "accion": "Confirmar combustible y arranque del grupo electrógeno. Revisar UPS y tableros críticos."},
+      {"sistema": "HVAC", "responsable": "Mantenimiento de tienda", "accion": "Proteger unidades exteriores y confirmar que tomas de aire y drenajes no estén obstruidos."},
+      {"sistema": "ACI", "responsable": "Seguridad", "accion": "Confirmar que el sistema contraincendios y el tanque de agua estén operativos."},
+      {"sistema": "Contratistas", "responsable": "Mantenimiento corporativo", "accion": "Dejar avisadas a las contratas de guardia (eléctrico, HVAC, ascensores, impermeabilización)."}
+    ],
+    "durante": [
+      {"sistema": "Personas", "responsable": "Gerente de tienda", "accion": "Restringir accesos a zonas inundables o con riesgo de caída de elementos."},
+      {"sistema": "Transporte vertical", "responsable": "Mantenimiento de tienda", "accion": "Evaluar el uso de ascensores y escaleras en niveles bajos si hay ingreso de agua."},
+      {"sistema": "Comunicación", "responsable": "Gerente de tienda", "accion": "Reportar cada incidencia en el momento. Las decisiones de cierre o evacuación las toma el gerente con Seguridad y Operaciones."}
+    ],
+    "despues": [
+      {"sistema": "Registro", "responsable": "Mantenimiento de tienda", "accion": "Registrar daños con fotos y generar los correctivos en Faldama."},
+      {"sistema": "Energía", "responsable": "Mantenimiento de tienda", "accion": "Revisar tableros, UPS y equipos que se hayan mojado antes de reenergizar."},
+      {"sistema": "Techos y drenaje", "responsable": "Mantenimiento de tienda", "accion": "Inspeccionar filtraciones y limpiar sumideros y canaletas."}
+    ]
+  },
+  "2": {
+    "antes": [
+      {"sistema": "Techos y drenaje", "responsable": "Mantenimiento de tienda", "accion": "Inspección preventiva de techos, canaletas y sumideros durante el día."},
+      {"sistema": "Energía", "responsable": "Mantenimiento de tienda", "accion": "Probar el grupo electrógeno y revisar tableros críticos."},
+      {"sistema": "Contratistas", "responsable": "Mantenimiento corporativo", "accion": "Avisar a las contratas para atención rápida de correctivos."},
+      {"sistema": "Comunicación", "responsable": "Gerente de tienda", "accion": "Informar al equipo el nivel de riesgo y definir un punto de contacto de guardia."}
+    ],
+    "durante": [
+      {"sistema": "Techos y drenaje", "responsable": "Mantenimiento de tienda", "accion": "Revisar goteras y zonas bajas cada vez que aumente la lluvia."},
+      {"sistema": "Comunicación", "responsable": "Gerente de tienda", "accion": "Reportar cualquier incidencia a Mantenimiento corporativo."}
+    ],
+    "despues": [
+      {"sistema": "Registro", "responsable": "Mantenimiento de tienda", "accion": "Registrar en Faldama cualquier daño o filtración encontrada."}
+    ]
+  },
+  "1": {
+    "antes": [
+      {"sistema": "Monitoreo", "responsable": "Gerente de tienda", "accion": "Seguir este tablero cada 2 horas."},
+      {"sistema": "Techos y drenaje", "responsable": "Mantenimiento de tienda", "accion": "Verificar que sumideros y canaletas estén despejados."}
+    ],
+    "durante": [],
+    "despues": []
+  },
+  "0": {
+    "antes": [
+      {"sistema": "Monitoreo", "responsable": "Gerente de tienda", "accion": "Sin acciones adicionales. Mantener el monitoreo normal."}
+    ],
+    "durante": [],
+    "despues": []
+  }
 }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Riesgo climático y sismos · Tiendas Falabella Perú</title>
+<title>Monitoreo de riesgo climático · Tiendas Falabella Perú</title>
 <link rel="stylesheet" href="lib/leaflet/leaflet.css">
 <style>
   :root { --bg:#f4f6f8; --card:#fff; --ink:#1b2430; --mute:#5a6675; --line:#dde2e8; --acc:#1f4e8c;
@@ -13,13 +13,15 @@
          display:flex; flex-direction:column; height:100vh; }
   header { background:var(--acc); color:#fff; padding:9px 14px; display:flex; flex-wrap:wrap; gap:4px 16px; align-items:center; }
   header h1 { font-size:17px; margin:0; font-weight:650; }
-  header .meta { font-size:12.5px; }
-  .stale { background:#fff3cd; color:#664d03; padding:6px 14px; font-size:13px; display:none; }
-  .stale.show { display:block; }
-  .layout { display:grid; grid-template-columns:420px 1fr; flex:1; min-height:0; }
+  header .meta { font-size:12.5px; } header .en { background:rgba(255,255,255,.18); border-radius:12px; padding:2px 10px; font-size:12.5px; }
+  header .en a { color:#fff; }
+  #banner { padding:7px 14px; font-size:14px; color:#fff; display:flex; flex-wrap:wrap; gap:4px 14px; align-items:center; }
+  #banner a { color:inherit; font-weight:600; cursor:pointer; text-decoration:underline; }
+  .b0 { background:var(--n0); } .b1 { background:var(--n1); color:#1b2430 !important; } .b2 { background:var(--n2); } .b3 { background:var(--n3); }
+  .stale { background:#fff3cd; color:#664d03; padding:6px 14px; font-size:13px; display:none; } .stale.show { display:block; }
+  .layout { display:grid; grid-template-columns:430px 1fr; flex:1; min-height:0; }
   aside { background:var(--card); border-right:1px solid var(--line); overflow:auto; padding:10px 12px 20px; }
-  #mapwrap { position:relative; min-height:0; }
-  #map { height:100%; }
+  #mapwrap { position:relative; min-height:0; } #map { height:100%; }
   .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:8px; }
   .kpi { border:2px solid transparent; border-radius:8px; padding:6px 4px; text-align:center; cursor:pointer; color:#fff; }
   .kpi b { display:block; font-size:22px; line-height:1.1; } .kpi span { font-size:12px; }
@@ -28,7 +30,7 @@
   .row2 { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; align-items:center; }
   .chip { border:1px solid var(--line); background:#fff; border-radius:14px; padding:3px 10px; font-size:12.5px; cursor:pointer; color:var(--ink); }
   .chip.on { background:var(--acc); color:#fff; border-color:var(--acc); }
-  input[type=search] { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; margin:4px 0 6px; font-size:14px; }
+  input[type=search], input.url { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; margin:4px 0 6px; font-size:14px; }
   button.btn { border:1px solid var(--acc); background:#fff; color:var(--acc); border-radius:6px; padding:5px 10px; font-size:13px; cursor:pointer; }
   button.btn:hover { background:#eef3fa; }
   .row { display:grid; grid-template-columns:70px 1fr; gap:8px; padding:7px 4px; border-bottom:1px solid var(--line); cursor:pointer; }
@@ -36,33 +38,40 @@
   .lv { font-size:12px; padding:2px 6px; border-radius:10px; text-align:center; color:#fff; height:fit-content; }
   .lv.l1 { color:#1b2430; }
   .bg3 { background:var(--n3); } .bg2 { background:var(--n2); } .bg1 { background:var(--n1); } .bg0 { background:var(--n0); } .bgn { background:var(--ng); }
-  .row b { font-weight:600; } .row .sub { color:var(--mute); font-size:12px; }
+  .row b { font-weight:600; } .sub { color:var(--mute); font-size:12px; }
   .tg { display:inline-block; font-size:11.5px; color:var(--mute); border:1px solid var(--line); border-radius:8px; padding:0 6px; margin:2px 3px 0 0; }
   .tg.hot { color:#fff; background:#2a6fb0; border-color:#2a6fb0; }
   .detalle { border:2px solid var(--acc); border-radius:10px; padding:10px 12px; margin:8px 0 12px; background:#fafcff; }
-  .detalle h2 { font-size:16px; margin:0 0 2px; }
-  .detalle h3 { font-size:13px; margin:10px 0 4px; }
+  .detalle h2 { font-size:16px; margin:0 0 2px; } .detalle h3 { font-size:13px; margin:12px 0 4px; }
+  .frase { background:#fff; border-left:5px solid var(--acc); padding:8px 10px; margin:8px 0; font-size:15px; line-height:1.4; }
   .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
   .m { background:#fff; border:1px solid var(--line); border-radius:6px; padding:5px 7px; } .m b { display:block; font-size:15px; } .m span { font-size:11.5px; color:var(--mute); }
+  .dias { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .dia { border-radius:6px; padding:6px 8px; color:#fff; font-size:12px; } .dia b { display:block; font-size:13px; } .dia.d1 { color:#1b2430; }
   ul.mot { margin:4px 0; padding-left:18px; }
+  .fase { font-size:12px; font-weight:700; color:var(--acc); text-transform:uppercase; letter-spacing:.03em; margin:10px 0 2px; }
   .plan label { display:flex; gap:7px; align-items:flex-start; margin:4px 0; font-size:13px; }
-  .plan .sis { font-size:11.5px; color:var(--acc); font-weight:600; }
-  .box { border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:10px 0; background:#fafbfc; }
-  .box h2 { font-size:13px; margin:0 0 4px; }
-  .small { font-size:12px; color:var(--mute); }
-  a { color:var(--acc); } .ok { color:var(--n0); } .err { color:var(--n3); }
+  .plan .sis { font-size:11.5px; color:var(--acc); font-weight:600; } .plan .resp { font-size:11.5px; color:var(--mute); }
+  details { border:1px solid var(--line); border-radius:8px; padding:6px 10px; margin:10px 0; background:#fafbfc; }
+  details > summary { cursor:pointer; font-weight:600; font-size:13px; } details[open] > summary { margin-bottom:6px; }
+  .small { font-size:12px; color:var(--mute); } a { color:var(--acc); } .ok { color:var(--n0); } .err { color:var(--n3); }
   .legend { position:absolute; right:10px; bottom:24px; z-index:500; background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:12px; }
   .legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
   .close { float:right; border:0; background:none; font-size:20px; line-height:1; cursor:pointer; color:var(--mute); }
-  @media (max-width:860px) { body { height:auto; } .layout { grid-template-columns:1fr; grid-template-rows:60vh auto; }
-    #mapwrap { order:-1; height:60vh; } aside { border-right:0; border-top:1px solid var(--line); } }
+  .qr { text-align:center; margin-top:6px; } .qr svg { width:170px; height:170px; }
+  body.solo .kpis, body.solo #flags, body.solo #zonas, body.solo #q, body.solo #lista, body.solo #banner, body.solo #copiar { display:none; }
+  #todas { display:none; } body.solo #todas { display:inline-block; }
+  @media (max-width:860px) { body { height:auto; } .layout { grid-template-columns:1fr; grid-template-rows:55vh auto; }
+    #mapwrap { order:-1; height:55vh; } aside { border-right:0; border-top:1px solid var(--line); } }
 </style>
 </head>
 <body>
 <header>
-  <h1>Riesgo climático y sismos · Tiendas Falabella Perú</h1>
+  <h1>Monitoreo de riesgo climático · Tiendas Falabella Perú</h1>
   <div class="meta" id="meta">Cargando…</div>
+  <div class="en" id="enfen"></div>
 </header>
+<div id="banner"></div>
 <div class="stale" id="stale"></div>
 <div class="layout">
   <aside>
@@ -70,13 +79,15 @@
     <div class="row2" id="flags"></div>
     <div class="row2" id="zonas"></div>
     <input type="search" id="q" placeholder="Buscar tienda o ciudad">
-    <div class="row2"><button class="btn" id="copiar">Copiar resumen para WhatsApp</button><span class="small" id="copiado"></span></div>
+    <div class="row2"><button class="btn" id="copiar">Copiar resumen para WhatsApp</button><button class="btn" id="todas">Ver todas las tiendas</button><span class="small" id="copiado"></span></div>
     <div id="detalle"></div>
     <div id="lista"></div>
-    <div class="box" id="enfen"></div>
-    <div class="box"><h2>Sismos recientes (24 h, M4.0+)</h2><div id="sismos" class="small"></div></div>
-    <div class="box"><h2>Boletines de tsunami (NOAA/PTWC)</h2><div id="tsunami" class="small"></div></div>
-    <div class="box"><h2>Fuentes oficiales (consultar siempre)</h2>
+    <details id="sec-sismos"><summary id="sum-sismos">Sismos y tsunami</summary>
+      <div class="small"><b>Sismos de las últimas 24 h (M4.0+)</b></div><div id="sismos" class="small"></div>
+      <div class="small" style="margin-top:8px"><b>Boletines de tsunami (NOAA/PTWC)</b></div><div id="tsunami" class="small"></div>
+      <div class="small" style="margin-top:6px">Para Perú, la alerta oficial de tsunami es la de la DHN.</div>
+    </details>
+    <details><summary>Fuentes oficiales para confirmar</summary>
       <ul class="small" style="margin:4px 0;padding-left:16px">
         <li><a href="https://www.senamhi.gob.pe/?p=aviso-meteorologico" target="_blank" rel="noopener">SENAMHI: avisos meteorológicos</a></li>
         <li><a href="https://www.senamhi.gob.pe/?p=aviso-hidrologico" target="_blank" rel="noopener">SENAMHI: avisos hidrológicos (ríos y huaicos)</a></li>
@@ -85,9 +96,9 @@
         <li><a href="https://www.dhn.mil.pe/" target="_blank" rel="noopener">DHN: alertas de tsunami</a></li>
         <li><a href="https://ultimosismo.igp.gob.pe/" target="_blank" rel="noopener">IGP: últimos sismos</a></li>
       </ul>
-    </div>
-    <div class="small" id="fuentes"></div>
-    <p class="small"><b>Aviso:</b> herramienta informativa de apoyo. El nivel de riesgo se calcula con pronósticos y umbrales referenciales; no reemplaza los avisos ni las indicaciones oficiales de SENAMHI, INDECI, DHN e IGP, ni los protocolos internos. Las ubicaciones de las tiendas son aproximadas. Los planes de acción son un borrador sujeto a validación de Mantenimiento y Prevención.</p>
+    </details>
+    <details><summary>Estado de las fuentes de datos</summary><div class="small" id="fuentes"></div></details>
+    <p class="small"><b>Aviso:</b> herramienta informativa de apoyo. El nivel de riesgo se calcula con pronósticos y umbrales referenciales; no reemplaza los avisos ni las indicaciones oficiales de SENAMHI, INDECI, DHN e IGP, ni los protocolos internos. Las decisiones de cierre o evacuación de una tienda las toma el gerente de tienda con Seguridad y Operaciones. Las ubicaciones son aproximadas. Los planes de acción son un borrador sujeto a validación de Mantenimiento y Prevención.</p>
   </aside>
   <div id="mapwrap">
     <div id="map"></div>
@@ -99,20 +110,22 @@
   </div>
 </div>
 <script src="lib/leaflet/leaflet.js"></script>
+<script src="lib/qrcode.js"></script>
 <script>
 const COL = ["#2e8b57", "#d9a400", "#e8731a", "#c62828"], GRIS = "#8a8f98", NV = ["Bajo", "Medio", "Alto", "Crítico"];
+const params = new URLSearchParams(location.search);
 const map = L.map("map").setView([-9.5, -76], 5);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
 const capaT = L.layerGroup().addTo(map), capaS = L.layerGroup().addTo(map);
 let S = null, zona = "Todas", texto = "", niveles = new Set([0, 1, 2, 3, null]), solo = { lluvia: false, tormenta: false, viento: false };
-let sel = null, marcadores = {};
+let sel = null, marcadores = {}, soloTienda = params.get("t");
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const col = t => t.nivel == null ? GRIS : COL[t.nivel];
 const lvClass = t => t.nivel == null ? "bgn" : "bg" + t.nivel + (t.nivel === 1 ? " l1" : "");
 const horaLima = iso => new Date(iso).toLocaleString("es-PE", { timeZone: "America/Lima", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-const tiendaCorta = t => t.nombre.replace("Falabella ", "");
+const corto = t => t.nombre.replace("Falabella ", "");
 
 function visibles() {
   const q = texto.trim().toLowerCase();
@@ -120,6 +133,16 @@ function visibles() {
     (!solo.lluvia || t.flags?.lluvia) && (!solo.tormenta || t.flags?.tormenta) && (!solo.viento || t.flags?.viento) &&
     (!q || (t.nombre + " " + t.ciudad + " " + t.region).toLowerCase().includes(q)))
     .sort((a, b) => (b.nivel ?? -1) - (a.nivel ?? -1) || (b.clima?.mm_24h ?? 0) - (a.clima?.mm_24h ?? 0));
+}
+
+function banner() {
+  const r = S.resumen, mx = r["Crítico"] ? 3 : r["Alto"] ? 2 : r["Medio"] ? 1 : 0, b = document.getElementById("banner");
+  b.className = "b" + mx;
+  const crit = S.tiendas.filter(t => t.nivel === 3).slice(0, 5);
+  const hoy = mx >= 2 ? `Atención: ${r["Crítico"]} tienda(s) en nivel crítico y ${r["Alto"]} en alto` : mx === 1 ? "Situación bajo control, con tiendas en seguimiento" : "Sin riesgo relevante en las tiendas";
+  b.innerHTML = `<b>${hoy}.</b> <span>Críticas ${r["Crítico"]} · Altas ${r["Alto"]} · Medias ${r["Medio"]} · Bajas ${r["Bajo"]}${r["Sin datos"] ? " · Sin datos " + r["Sin datos"] : ""}</span>` +
+    (crit.length ? `<span>Críticas: ${crit.map(t => `<a data-id="${t.id}">${esc(corto(t))}</a>`).join(", ")}</span>` : "");
+  b.querySelectorAll("a").forEach(a => a.onclick = () => seleccionar(a.dataset.id, true));
 }
 
 function kpis() {
@@ -147,27 +170,26 @@ function filtros() {
 }
 
 function tags(t) {
-  const f = t.flags || [], c = t.clima, out = [];
+  const f = t.flags || {}, c = t.clima, out = [];
   if (f.lluvia) out.push('<span class="tg hot">Lloviendo</span>');
   if (f.tormenta) out.push('<span class="tg hot">Tormenta</span>');
   if (f.granizo) out.push('<span class="tg">Granizo posible</span>');
-  if (c) out.push(`<span class="tg">${c.mm_24h} mm/24 h</span>`, `<span class="tg">prob. ${c.prob_max_24h ?? "–"}%</span>`);
-  if (c && c.rafaga_max_kmh != null) out.push(`<span class="tg">ráfaga ${c.rafaga_max_kmh} km/h</span>`);
+  if (c) out.push(`<span class="tg">${c.mm_24h} mm en 24 h</span>`);
   if (t.sismos_cerca?.length) out.push(`<span class="tg">sismo M${t.sismos_cerca[0].mag}</span>`);
   return out.join("");
 }
 
 function pintar() {
   capaT.clearLayers(); marcadores = {};
-  const v = visibles();
+  const v = soloTienda ? S.tiendas.filter(t => t.id === soloTienda && t.lat != null) : visibles();
   v.forEach(t => {
     const r = t.nivel == null ? 7 : [7, 8, 10, 12][t.nivel];
     marcadores[t.id] = L.circleMarker([t.lat, t.lon], { radius: r, color: t.nivel === 3 ? "#7f1111" : "#fff", weight: t.nivel === 3 ? 3 : 2, fillColor: col(t), fillOpacity: .95 })
-      .bindTooltip(`${esc(tiendaCorta(t))}: ${esc(t.nivel_txt)}`).on("click", () => seleccionar(t.id, false)).addTo(capaT);
+      .bindTooltip(`${esc(corto(t))}: ${esc(t.nivel_txt)}`).on("click", () => seleccionar(t.id, false)).addTo(capaT);
   });
-  document.getElementById("lista").innerHTML = v.map(t =>
+  document.getElementById("lista").innerHTML = visibles().map(t =>
     `<div class="row ${sel === t.id ? "sel" : ""}" data-id="${t.id}"><span class="lv ${lvClass(t)}">${esc(t.nivel_txt)}</span>
-     <div><b>${esc(tiendaCorta(t))}</b> <span class="sub">· ${esc(t.ciudad)} · ${esc(t.zona)}</span><div>${tags(t)}</div></div></div>`).join("")
+     <div><b>${esc(corto(t))}</b> <span class="sub">· ${esc(t.ciudad)} · ${esc(t.zona)}</span><div>${tags(t)}</div></div></div>`).join("")
     || '<div class="small" style="padding:10px">Ninguna tienda con estos filtros.</div>';
   document.querySelectorAll(".row").forEach(r => r.onclick = () => seleccionar(r.dataset.id, true));
 }
@@ -179,33 +201,60 @@ function barras(horas) {
     return `<rect x="${i * (w + g)}" y="${H - alto - 2}" width="${w}" height="${Math.max(alto, 1)}" fill="${h.mm >= 1 ? "#2a6fb0" : "#b7c5d6"}"><title>${h.h}:00 · ${h.mm} mm · prob. ${h.prob}%</title></rect>`;
   }).join("");
   return `<svg viewBox="0 0 ${horas.length * (w + g)} ${H}" width="100%" height="${H}" role="img" aria-label="Lluvia prevista por hora, próximas 24 horas">${b}</svg>
-          <div class="small" style="display:flex;justify-content:space-between"><span>${horas[0].h}:00</span><span>próximas 24 h (barras = mm/h; máx. ${max} mm)</span><span>${horas[horas.length - 1].h}:00</span></div>`;
+          <div class="small" style="display:flex;justify-content:space-between"><span>${horas[0].h}:00</span><span>próximas 24 h (máx. ${max} mm/h)</span><span>${horas[horas.length - 1].h}:00</span></div>`;
+}
+
+function plan(t) {
+  const p = S.acciones[t.nivel ?? 0] || {}, fases = [["antes", "Antes"], ["durante", "Durante"], ["despues", "Después"]];
+  return fases.filter(([k]) => (p[k] || []).length).map(([k, n]) => `<div class="fase">${n}</div>` +
+    p[k].map(x => `<label><input type="checkbox"><span><span class="sis">${esc(x.sistema)}</span> <span class="resp">· ${esc(x.responsable)}</span><br>${esc(x.accion)}</span></label>`).join("")).join("");
 }
 
 function detalle() {
   const cont = document.getElementById("detalle"), t = S.tiendas.find(x => x.id === sel);
   if (!t) { cont.innerHTML = ""; return; }
-  const c = t.clima, a = t.aeropuerto, o = a?.obs, acc = S.acciones[t.nivel ?? 0] || [];
+  const c = t.clima, a = t.aeropuerto, o = a?.obs;
   let h = `<div class="detalle"><button class="close" aria-label="Cerrar" id="cerrar">×</button>
     <h2>${esc(t.nombre)}</h2><div class="small">${esc(t.ciudad)}, ${esc(t.region)} · ${esc(t.zona)}</div>
     <div style="margin:6px 0"><span class="lv ${lvClass(t)}" style="display:inline-block;padding:3px 12px;font-size:13px">Nivel ${esc(t.nivel_txt.toLowerCase())}</span></div>
+    <div class="frase">${esc(t.frase)}</div>
     <ul class="mot">${t.motivos.length ? t.motivos.map(m => `<li>${esc(m)}</li>`).join("") : "<li>Sin factores de riesgo en este momento.</li>"}</ul>`;
-  if (c) {
-    h += `<h3>Clima en la tienda</h3><div class="grid">
-      <div class="m"><b>${c.mm_ahora} mm/h</b><span>Ahora</span></div><div class="m"><b>${c.mm_6h} mm</b><span>Próx. 6 h</span></div><div class="m"><b>${c.mm_24h} mm</b><span>Próx. 24 h</span></div>
-      <div class="m"><b>${c.prob_max_24h ?? "–"}%</b><span>Prob. máx. 24 h</span></div><div class="m"><b>${c.rafaga_max_kmh ?? "–"} km/h</b><span>Ráfaga máx.</span></div><div class="m"><b>${c.temp_c ?? "–"} °C</b><span>Temperatura</span></div></div>
-      <div style="margin-top:8px">${barras(c.horas)}</div>`;
+  if (c?.dias?.length) {
+    h += `<h3>Próximos 3 días</h3><div class="dias">${c.dias.map(d => `<div class="dia bg${d.nivel} ${d.nivel === 1 ? "d1" : ""}"><b>${esc(d.etiqueta)}</b>Riesgo ${NV[d.nivel].toLowerCase()}<br>${d.mm} mm${d.tormenta ? " · tormenta" : ""}</div>`).join("")}</div>
+      <div class="small" style="margin-top:4px">Lluvia acumulada en los últimos 7 días: <b>${c.acum_7d_mm} mm</b>${c.acum_7d_mm > 0 ? ". Con el suelo húmedo, la misma lluvia pesa más." : "."}</div>`;
   }
-  if (a && o) {
-    h += `<h3>Aeropuerto más cercano: ${esc(a.nombre)} (${esc(a.icao)}, a ${a.km} km)</h3>
-      <div class="small">Observación de las ${o.hora_utc ? horaLima(o.hora_utc) : "–"} (hora Lima): ${o.fenomeno ? "fenómeno " + esc(o.fenomeno) : "sin precipitación"}${o.temp_c != null ? ", " + o.temp_c + " °C" : ""}${o.viento_kt != null ? ", viento " + o.viento_kt + " kt" : ""}${o.rafaga_kt ? " (ráfagas " + o.rafaga_kt + " kt)" : ""}.
-      ${a.km > 80 ? "<br>Está lejos de la tienda: úsalo solo como referencia." : ""}</div>`;
-  } else h += `<h3>Aeropuerto más cercano</h3><div class="small">Sin observación disponible en esta actualización.</div>`;
-  if (t.sismos_cerca?.length) h += `<h3>Sismos cerca (24 h)</h3><div class="small">${t.sismos_cerca.map(q => `M${q.mag} a ${q.km} km, hace ${q.hace_h} h`).join("<br>")}</div>`;
-  h += `<h3>Plan de acción sugerido (borrador)</h3><div class="plan">${acc.map(x => `<label><input type="checkbox"><span><span class="sis">${esc(x.sistema)}</span><br>${esc(x.accion)}</span></label>`).join("")}</div>
-    <div class="small" style="margin-top:6px">Confirma siempre con <a href="https://www.senamhi.gob.pe/?p=aviso-meteorologico" target="_blank" rel="noopener">SENAMHI</a> antes de decidir.${t.confianza === "media" || t.precision === "ciudad" ? " Ubicación aproximada de la tienda." : ""}</div></div>`;
+  h += `<h3>Plan de acción sugerido (borrador)</h3><div class="plan">${plan(t)}</div>`;
+  h += `<details><summary>Datos técnicos</summary>`;
+  if (c) h += `<div class="grid"><div class="m"><b>${c.mm_ahora} mm/h</b><span>Ahora</span></div><div class="m"><b>${c.mm_6h} mm</b><span>Próx. 6 h</span></div><div class="m"><b>${c.mm_24h} mm</b><span>Próx. 24 h</span></div>
+    <div class="m"><b>${c.prob_max_24h ?? "–"}%</b><span>Prob. máx. 24 h</span></div><div class="m"><b>${c.rafaga_max_kmh ?? "–"} km/h</b><span>Ráfaga máx.</span></div><div class="m"><b>${c.temp_c ?? "–"} °C</b><span>Temperatura</span></div></div>
+    <div style="margin-top:8px">${barras(c.horas)}</div>`;
+  if (a && o) h += `<div class="small" style="margin-top:8px"><b>Aeropuerto más cercano:</b> ${esc(a.nombre)} (${esc(a.icao)}, a ${a.km} km). Observación de las ${o.hora_utc ? horaLima(o.hora_utc) : "–"} (hora Lima): ${o.fenomeno ? "fenómeno " + esc(o.fenomeno) : "sin precipitación"}${o.temp_c != null ? ", " + o.temp_c + " °C" : ""}${o.viento_kt != null ? ", viento " + o.viento_kt + " kt" : ""}${o.rafaga_kt ? " (ráfagas " + o.rafaga_kt + " kt)" : ""}.${a.km > 80 ? " Está lejos de la tienda: úsalo solo como referencia." : ""}</div>`;
+  else h += `<div class="small" style="margin-top:8px">Sin observación de aeropuerto en esta actualización.</div>`;
+  if (t.sismos_cerca?.length) h += `<div class="small" style="margin-top:6px"><b>Sismos cerca (24 h):</b> ${t.sismos_cerca.map(q => `M${q.mag} a ${q.km} km, hace ${q.hace_h} h`).join("; ")}</div>`;
+  h += `</details>`;
+  h += `<div class="row2"><button class="btn" id="enlace">Enlace y QR de esta tienda</button></div><div id="qrbox"></div>
+    <div class="small">Confirma siempre con <a href="https://www.senamhi.gob.pe/?p=aviso-meteorologico" target="_blank" rel="noopener">SENAMHI</a> antes de decidir.${t.confianza === "media" || t.precision === "ciudad" ? " Ubicación aproximada de la tienda." : ""}</div></div>`;
   cont.innerHTML = h;
   document.getElementById("cerrar").onclick = () => { sel = null; detalle(); pintar(); };
+  document.getElementById("enlace").onclick = () => qr(t);
+}
+
+function enlaceTienda(t) { return location.origin + location.pathname + "?t=" + encodeURIComponent(t.id); }
+
+function qr(t) {
+  const url = enlaceTienda(t), box = document.getElementById("qrbox");
+  const q = qrcode(0, "M"); q.addData(url); q.make();
+  box.innerHTML = `<input class="url" readonly value="${esc(url)}" id="urlbox"><div class="row2"><button class="btn" id="cpurl">Copiar enlace</button><span class="small" id="cpok"></span></div>
+    <div class="qr">${q.createSvgTag({ cellSize: 4, margin: 2, scalable: true })}<div class="small">Imprime este QR y pégalo en la oficina de mantenimiento de la tienda.</div></div>`;
+  document.getElementById("cpurl").onclick = () => copiar(url, document.getElementById("cpok"));
+}
+
+async function copiar(txt, el) {
+  const ok = () => { el.textContent = "Copiado"; setTimeout(() => el.textContent = "", 2500); };
+  try { await navigator.clipboard.writeText(txt); ok(); } catch (e) {
+    const ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); ok(); } catch (_) { prompt("Copia este texto:", txt); } ta.remove();
+  }
 }
 
 function seleccionar(id, mover) {
@@ -216,43 +265,46 @@ function seleccionar(id, mover) {
 }
 
 function ajustar() {
-  const v = visibles(); if (v.length) map.fitBounds(L.latLngBounds(v.map(t => [t.lat, t.lon])).pad(.15), { maxZoom: 12 });
+  const v = soloTienda ? S.tiendas.filter(t => t.id === soloTienda) : visibles();
+  if (v.length === 1) map.setView([v[0].lat, v[0].lon], 11);
+  else if (v.length) map.fitBounds(L.latLngBounds(v.map(t => [t.lat, t.lon])).pad(.15), { maxZoom: 12 });
 }
 
 function secundarios() {
   capaS.clearLayers();
-  S.sismos.forEach(q => L.circle([q.lat, q.lon], { radius: Math.max(q.mag - 3, .5) * 12000, color: "#6a1b9a", weight: 1.5, fillOpacity: .15 })
+  S.sismos.forEach(q => L.circle([q.lat, q.lon], { radius: Math.max(q.mag - 3, .5) * 12000, color: "#6a1b9a", weight: 1.5, fillOpacity: .12 })
     .bindPopup(`<b>M${q.mag}</b> · ${esc(q.lugar)}<br>${horaLima(q.hora_utc)} (hora Lima) · prof. ${Math.round(q.prof_km)} km`).addTo(capaS));
-  const e = S.fuentes;
+  const e = S.fuentes, rel = S.tiendas.some(t => t.sismos_cerca?.some(q => q.mag >= 5));
+  document.getElementById("sum-sismos").textContent = `Sismos y tsunami · ${S.sismos.length} sismo(s) M4.0+ en 24 h` + (rel ? " · hay sismos fuertes cerca de tiendas" : "");
+  if (rel) document.getElementById("sec-sismos").open = true;
   document.getElementById("sismos").innerHTML = e.sismos.estado.startsWith("error") ? "No se pudo consultar la fuente en esta actualización." :
     S.sismos.length ? S.sismos.slice(0, 8).map(q => `<div>M${q.mag} · ${esc(q.lugar)} · ${horaLima(q.hora_utc)}</div>`).join("") : "Sin sismos M4.0+ en la región en las últimas 24 h.";
   document.getElementById("tsunami").innerHTML = e.tsunami.estado.startsWith("error") ? "No se pudo consultar la fuente. Revisa la DHN." :
-    S.tsunami.length ? S.tsunami.slice(0, 4).map(x => `<div><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.titulo)}</a><br>${esc(x.actualizado)}</div>`).join("") : "Sin boletines recientes. Para Perú, la alerta oficial es la de la DHN.";
+    S.tsunami.length ? S.tsunami.slice(0, 4).map(x => `<div><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.titulo)}</a><br>${esc(x.actualizado)}</div>`).join("") : "Sin boletines recientes.";
   const en = S.enfen || {};
-  document.getElementById("enfen").innerHTML = `<h2>El Niño costero (ENFEN)</h2><b>${esc(en.estado)}</b><br><span class="small">${esc(en.comunicado)} · <a href="${esc(en.url)}" target="_blank" rel="noopener">ver último comunicado</a></span>`;
-  document.getElementById("fuentes").innerHTML = "Estado de fuentes: " + Object.values(e).map(f => `<span class="${f.estado === "ok" ? "ok" : "err"}">${esc(f.nombre)}: ${f.estado === "ok" ? "ok" : "sin datos"}</span>`).join(" · ");
-  document.getElementById("meta").textContent = `Actualizado: ${S.generado_lima} (hora Lima) · se refresca cada 2 h` + (S.demo ? " · DATOS DE PRUEBA" : "");
+  document.getElementById("enfen").innerHTML = `El Niño costero: <b>${esc(en.estado)}</b> · <a href="${esc(en.url)}" target="_blank" rel="noopener">${esc(en.comunicado)}</a>`;
+  document.getElementById("fuentes").innerHTML = Object.values(e).map(f => `<div class="${f.estado === "ok" ? "ok" : "err"}">${esc(f.nombre)}: ${f.estado === "ok" ? "ok" : "sin datos"}</div>`).join("");
+  document.getElementById("meta").textContent = `Actualizado: ${S.generado_lima} (hora Lima) · cada 2 h` + (S.demo ? " · DATOS DE PRUEBA" : "");
   const hrs = (Date.now() - new Date(S.generado_utc)) / 36e5, st = document.getElementById("stale");
   if (hrs > 5) { st.textContent = `Atención: los datos tienen ${Math.round(hrs)} horas. La actualización automática puede estar detenida; consulta las fuentes oficiales.`; st.classList.add("show"); }
 }
 
 function resumenTexto() {
-  const l = n => S.tiendas.filter(t => t.nivel === n).map(tiendaCorta).join(", ") || "ninguna";
+  const l = n => S.tiendas.filter(t => t.nivel === n).map(corto).join(", ") || "ninguna";
   return `*Riesgo climático tiendas Falabella* (${S.generado_lima} hora Lima)\n` +
     `Crítico (${S.resumen["Crítico"]}): ${l(3)}\nAlto (${S.resumen["Alto"]}): ${l(2)}\nMedio (${S.resumen["Medio"]}): ${l(1)}\nBajo: ${S.resumen["Bajo"]} tiendas\n` +
-    `Detalle y plan de acción: ${location.href.split("?")[0]}\nReferencial; confirma con SENAMHI/INDECI.`;
+    `Detalle y plan de acción: ${location.origin + location.pathname}\nReferencial; confirma con SENAMHI/INDECI.`;
 }
 
-document.getElementById("copiar").onclick = async () => {
-  const txt = resumenTexto(), ok = () => { const e = document.getElementById("copiado"); e.textContent = "Copiado"; setTimeout(() => e.textContent = "", 2500); };
-  try { await navigator.clipboard.writeText(txt); ok(); } catch (e) {
-    const ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); ok(); } catch (_) { prompt("Copia este texto:", txt); } ta.remove();
-  }
-};
+document.getElementById("copiar").onclick = () => copiar(resumenTexto(), document.getElementById("copiado"));
+document.getElementById("todas").onclick = () => { location.href = location.pathname; };
 
 fetch("data/status.json?" + Date.now()).then(r => r.json()).then(d => {
-  S = d; kpis(); filtros(); secundarios(); pintar(); ajustar();
+  S = d;
+  if (soloTienda && !S.tiendas.some(t => t.id === soloTienda)) soloTienda = null;
+  if (soloTienda) document.body.classList.add("solo");
+  banner(); kpis(); filtros(); secundarios(); pintar(); ajustar();
+  if (soloTienda) { sel = soloTienda; detalle(); pintar(); }
   document.getElementById("q").oninput = e => { texto = e.target.value; pintar(); };
 }).catch(() => { document.getElementById("meta").textContent = "No se pudo cargar los datos. Intenta de nuevo en unos minutos."; });
 </script>
