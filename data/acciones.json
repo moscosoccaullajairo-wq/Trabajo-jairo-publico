@@ -1,0 +1,27 @@
+{
+  "_nota": "BORRADOR para validar por Mantenimiento y Prevencion. Se puede editar libremente. Cada nivel lista acciones por sistema.",
+  "3": [
+    {"sistema": "Comunicación", "accion": "Avisar al gerente de tienda y activar al responsable de contingencia. Informar a Mantenimiento corporativo."},
+    {"sistema": "Techos y drenaje", "accion": "Revisar techos, canaletas, sumideros y bajantes antes de que llegue la lluvia. Despejar hojas y residuos."},
+    {"sistema": "Techos y drenaje", "accion": "Verificar bombas de achique, sótanos y zonas bajas. Retirar mercadería y equipos del piso en zonas inundables."},
+    {"sistema": "Energía", "accion": "Confirmar combustible y arranque del grupo electrógeno. Revisar UPS y tableros críticos."},
+    {"sistema": "HVAC", "accion": "Proteger unidades exteriores y revisar que las tomas de aire y los drenajes no se obstruyan."},
+    {"sistema": "Transporte vertical", "accion": "Evaluar el uso de ascensores y escaleras en niveles bajos si hay riesgo de ingreso de agua."},
+    {"sistema": "ACI", "accion": "Confirmar que el sistema contraincendios y el tanque de agua estén operativos."},
+    {"sistema": "Contratistas", "accion": "Dejar avisados a las contratas de guardia (eléctrico, HVAC, ascensores, impermeabilización)."},
+    {"sistema": "Personas", "accion": "Restringir accesos a zonas inundables o con riesgo de caída de elementos. Registrar cada incidencia en Faldama."}
+  ],
+  "2": [
+    {"sistema": "Techos y drenaje", "accion": "Inspección preventiva de techos, canaletas y sumideros durante el día."},
+    {"sistema": "Energía", "accion": "Probar el grupo electrógeno y revisar tableros críticos."},
+    {"sistema": "Contratistas", "accion": "Avisar a las contratas para atención rápida de correctivos."},
+    {"sistema": "Comunicación", "accion": "Informar al gerente de tienda el nivel de riesgo y dejar un punto de contacto de guardia."}
+  ],
+  "1": [
+    {"sistema": "Monitoreo", "accion": "Seguimiento en este tablero cada 2 horas."},
+    {"sistema": "Techos y drenaje", "accion": "Verificar que sumideros y canaletas estén despejados."}
+  ],
+  "0": [
+    {"sistema": "Monitoreo", "accion": "Sin acciones adicionales. Mantener el monitoreo normal."}
+  ]
+}

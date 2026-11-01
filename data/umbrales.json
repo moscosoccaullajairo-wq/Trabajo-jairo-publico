@@ -1,0 +1,17 @@
+{
+  "_nota": "Umbrales referenciales para calcular el nivel de riesgo. Se pueden editar. mm = milimetros de lluvia, viento = rafaga maxima en km/h. 'costa' aplica a Lima y Callao, costa norte y costa sur, donde la lluvia es poco frecuente y la infraestructura no esta preparada para ella.",
+  "costa": {
+    "medio_mm24": 1, "alto_mm24": 5, "critico_mm24": 15,
+    "alto_mm6": 3, "critico_mm6": 8,
+    "medio_viento": 40, "alto_viento": 55, "critico_viento": 75
+  },
+  "andes_selva": {
+    "medio_mm24": 5, "alto_mm24": 20, "critico_mm24": 50,
+    "alto_mm6": 10, "critico_mm6": 25,
+    "medio_viento": 45, "alto_viento": 60, "critico_viento": 80
+  },
+  "zonas_costa": ["Lima y Callao", "Costa norte", "Costa sur"],
+  "lluvia_ahora_alto_mm_h": 2.5,
+  "aeropuerto_radio_km": 80,
+  "sismo": {"critico_mag": 6.0, "alto_mag": 5.0, "alto_km": 200, "medio_mag": 4.5, "medio_km": 100}
+}
