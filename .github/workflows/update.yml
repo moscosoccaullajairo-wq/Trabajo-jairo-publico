@@ -1,0 +1,61 @@
+name: Actualizar y publicar mapa
+
+on:
+  schedule:
+    - cron: "7 */2 * * *"   # cada 2 horas (hora UTC); GitHub puede demorar unos minutos
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generar datos
+        run: python scripts/update.py
+
+      - name: Guardar coordenadas nuevas (solo si cambiaron)
+        run: |
+          if ! git diff --quiet -- data/coords.json || [ -n "$(git ls-files --others --exclude-standard data/coords.json)" ]; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@users.noreply.github.com"
+            git add data/coords.json
+            git commit -m "Actualizar coordenadas de tiendas"
+            git push
+          fi
+
+      - name: Armar sitio
+        run: |
+          mkdir -p _site/data
+          cp index.html _site/
+          cp -r lib _site/
+          cp data/status.json _site/data/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

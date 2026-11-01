@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoreo clima y sismos · Tiendas Falabella Perú</title>
+<link rel="stylesheet" href="lib/leaflet/leaflet.css">
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2430; --mute:#5b6675; --line:#dfe3e8;
+          --n0:#2e8b57; --n1:#d9a400; --n2:#e8731a; --n3:#c62828; --acc:#1f4e8c; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--acc); color:#fff; padding:10px 14px; display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center; }
+  header h1 { font-size:17px; margin:0; font-weight:650; }
+  header .meta { font-size:12.5px; opacity:.95; }
+  .stale { background:#fff3cd; color:#664d03; padding:6px 14px; font-size:13px; display:none; }
+  .stale.show { display:block; }
+  body { display:flex; flex-direction:column; height:100vh; }
+  .layout { display:grid; grid-template-columns:340px 1fr; flex:1; min-height:0; }
+  aside { background:var(--card); border-right:1px solid var(--line); overflow:auto; padding:10px; }
+  #map { height:100%; }
+  .box { border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-bottom:10px; background:#fafbfc; }
+  .box h2 { font-size:13px; margin:0 0 4px; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px; }
+  .chip { border:1px solid var(--line); background:#fff; border-radius:14px; padding:3px 10px; font-size:12.5px; cursor:pointer; }
+  .chip.on { background:var(--acc); color:#fff; border-color:var(--acc); }
+  input[type=search] { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; margin-bottom:8px; font-size:14px; }
+  .row { display:flex; align-items:center; gap:8px; padding:6px 4px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .row:hover { background:#f0f4fa; }
+  .dot { width:12px; height:12px; border-radius:50%; flex:none; }
+  .row .t { flex:1; min-width:0; }
+  .row .t b { display:block; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row .t span { color:var(--mute); font-size:12px; }
+  .badge { font-size:11.5px; padding:1px 7px; border-radius:10px; color:#fff; white-space:nowrap; }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 12px; font-size:12px; color:var(--mute); margin:4px 0 8px; }
+  .legend i { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+  .small { font-size:12px; color:var(--mute); }
+  .src li { margin:2px 0; } .src { padding-left:16px; margin:4px 0; }
+  a { color:var(--acc); }
+  .ok { color:var(--n0); } .err { color:var(--n3); }
+  @media (max-width:800px) { body { height:auto; } .layout { grid-template-columns:1fr; grid-template-rows:55vh auto; }
+    #map { height:55vh; order:-1; } aside { border-right:0; border-top:1px solid var(--line); max-height:none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Clima y sismos · Tiendas Falabella Perú</h1>
+  <div class="meta" id="meta">Cargando…</div>
+</header>
+<div class="stale" id="stale"></div>
+<div class="layout">
+  <aside>
+    <div class="box" id="enfen"></div>
+    <div class="chips" id="zonas"></div>
+    <input type="search" id="q" placeholder="Buscar tienda o ciudad">
+    <div class="legend">
+      <span><i style="background:var(--n0)"></i>Bajo</span>
+      <span><i style="background:var(--n1)"></i>Moderado</span>
+      <span><i style="background:var(--n2)"></i>Alto</span>
+      <span><i style="background:var(--n3)"></i>Muy alto</span>
+      <span><i style="background:#888"></i>Sin datos</span>
+    </div>
+    <div class="small" style="margin-bottom:6px">Nivel según lluvia prevista en las próximas 24 h (referencial).</div>
+    <div id="lista"></div>
+    <div class="box" style="margin-top:12px"><h2>Sismos recientes (24 h, M4.0+)</h2><div id="sismos" class="small"></div></div>
+    <div class="box"><h2>Boletines de tsunami (NOAA/PTWC)</h2><div id="tsunami" class="small"></div></div>
+    <div class="box"><h2>Fuentes oficiales (consultar siempre)</h2>
+      <ul class="src small">
+        <li><a href="https://www.senamhi.gob.pe/?p=aviso-meteorologico" target="_blank" rel="noopener">SENAMHI: avisos meteorológicos</a></li>
+        <li><a href="https://www.gob.pe/indeci" target="_blank" rel="noopener">INDECI / COEN: emergencias</a></li>
+        <li><a href="https://enfen.imarpe.gob.pe/" target="_blank" rel="noopener">ENFEN: comunicados El Niño costero</a></li>
+        <li><a href="https://www.dhn.mil.pe/" target="_blank" rel="noopener">DHN: alertas de tsunami (SNAM)</a></li>
+        <li><a href="https://ultimosismo.igp.gob.pe/" target="_blank" rel="noopener">IGP: últimos sismos</a></li>
+      </ul>
+    </div>
+    <div class="small" id="fuentes"></div>
+    <p class="small"><b>Aviso:</b> herramienta informativa de apoyo. No reemplaza los avisos ni las indicaciones oficiales de SENAMHI, INDECI, DHN, IGP ni los protocolos internos de la empresa. Las ubicaciones son aproximadas (centro del mall o dirección geocodificada en OpenStreetMap).</p>
+  </aside>
+  <div id="map"></div>
+</div>
+<script src="lib/leaflet/leaflet.js"></script>
+<script>
+const COL = ["#2e8b57", "#d9a400", "#e8731a", "#c62828"], GRIS = "#888";
+const map = L.map("map").setView([-9.5, -76], 5);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+const capaT = L.layerGroup().addTo(map), capaS = L.layerGroup().addTo(map);
+let S = null, zona = "Todas", texto = "", marcadores = {};
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const color = t => t.clima ? COL[t.clima.nivel] : GRIS;
+const etiqueta = t => t.clima ? t.clima.nivel_txt : "Sin datos";
+const horaLima = iso => new Date(iso).toLocaleString("es-PE", { timeZone: "America/Lima", day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+
+function popup(t) {
+  const c = t.clima;
+  const l = [`<b>${esc(t.nombre)}</b>`, `${esc(t.ciudad)}, ${esc(t.region)} · ${esc(t.zona)}`];
+  if (c) {
+    l.push(`Lluvia próx. 6 h: <b>${c.mm_6h} mm</b> · 24 h: <b>${c.mm_24h} mm</b>`);
+    if (c.prob_max_24h != null) l.push(`Prob. máx. de lluvia: ${c.prob_max_24h}%`);
+    if (c.temp_c != null) l.push(`Temperatura: ${c.temp_c} °C`);
+    l.push(`Nivel: <b>${esc(c.nivel_txt)}</b>`);
+  } else l.push("Sin datos de clima en esta actualización.");
+  if (t.sismos_200km_24h) l.push(`Sismos a menos de 200 km (24 h): ${t.sismos_200km_24h}, máx. M${t.sismo_max_cercano}`);
+  if (t.confianza === "media" || t.precision === "ciudad") l.push('<span style="color:#888">Ubicación aproximada, por confirmar.</span>');
+  return l.join("<br>");
+}
+
+function visibles() {
+  const q = texto.trim().toLowerCase();
+  return S.tiendas.filter(t => t.lat != null && (zona === "Todas" || t.zona === zona) &&
+    (!q || (t.nombre + " " + t.ciudad + " " + t.region).toLowerCase().includes(q)));
+}
+
+function pintar() {
+  capaT.clearLayers(); marcadores = {};
+  const v = visibles().sort((a, b) => (b.clima?.nivel ?? -1) - (a.clima?.nivel ?? -1) || a.nombre.localeCompare(b.nombre));
+  v.forEach(t => {
+    const m = L.circleMarker([t.lat, t.lon], { radius: 9, color: "#fff", weight: 2, fillColor: color(t), fillOpacity: .95 })
+      .bindPopup(popup(t)).addTo(capaT);
+    marcadores[t.id] = m;
+  });
+  document.getElementById("lista").innerHTML = v.map(t =>
+    `<div class="row" data-id="${t.id}"><span class="dot" style="background:${color(t)}"></span>
+     <div class="t"><b>${esc(t.nombre.replace("Falabella ", ""))}</b><span>${esc(t.ciudad)} · ${t.clima ? t.clima.mm_24h + " mm/24 h" : "sin datos"}</span></div>
+     <span class="badge" style="background:${color(t)}">${etiqueta(t)}</span></div>`).join("") || '<div class="small">Sin resultados.</div>';
+  document.querySelectorAll(".row").forEach(r => r.onclick = () => {
+    const t = S.tiendas.find(x => x.id === r.dataset.id), m = marcadores[t.id];
+    map.setView([t.lat, t.lon], 11); m && m.openPopup();
+  });
+}
+
+function pintarSismos() {
+  capaS.clearLayers();
+  S.sismos.forEach(q => L.circle([q.lat, q.lon], { radius: Math.max(q.mag - 3, 0.5) * 12000, color: "#6a1b9a", weight: 1.5, fillOpacity: .15 })
+    .bindPopup(`<b>M${q.mag}</b> · ${esc(q.lugar)}<br>${horaLima(q.hora_utc)} (hora Lima) · prof. ${Math.round(q.prof_km)} km`).addTo(capaS));
+  const f = S.fuentes.sismos.estado;
+  document.getElementById("sismos").innerHTML = f.startsWith("error") ? "No se pudo consultar la fuente en esta actualización." :
+    S.sismos.length ? S.sismos.slice(0, 8).map(q => `<div>M${q.mag} · ${esc(q.lugar)} · ${horaLima(q.hora_utc)}</div>`).join("") : "Sin sismos M4.0+ en la región en las últimas 24 h.";
+  const ts = S.fuentes.tsunami.estado;
+  document.getElementById("tsunami").innerHTML = ts.startsWith("error") ? "No se pudo consultar la fuente. Revisa la DHN." :
+    S.tsunami.length ? S.tsunami.slice(0, 4).map(e => `<div><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.titulo)}</a><br><span>${esc(e.actualizado)}</span></div>`).join("") : "Sin boletines recientes. Para Perú, la alerta oficial es la de la DHN.";
+}
+
+function cabecera() {
+  const e = S.enfen || {};
+  document.getElementById("enfen").innerHTML = `<h2>El Niño costero (ENFEN)</h2><b>${esc(e.estado)}</b><br><span class="small">${esc(e.comunicado)} · <a href="${esc(e.url)}" target="_blank" rel="noopener">ver último comunicado</a></span>`;
+  document.getElementById("meta").textContent = `Actualizado: ${S.generado_lima} (hora Lima) · se refresca cada 2 h` + (S.demo ? " · DATOS DE PRUEBA" : "");
+  const horas = (Date.now() - new Date(S.generado_utc)) / 36e5, st = document.getElementById("stale");
+  if (horas > 5) { st.textContent = `Atención: los datos tienen ${Math.round(horas)} horas. La actualización automática puede estar detenida; consulta las fuentes oficiales.`; st.classList.add("show"); }
+  document.getElementById("fuentes").innerHTML = "Estado de fuentes: " + Object.values(S.fuentes).map(f =>
+    `<span class="${f.estado === "ok" ? "ok" : "err"}">${esc(f.nombre)}: ${f.estado === "ok" ? "ok" : "sin datos"}</span>`).join(" · ");
+  const zs = ["Todas", ...new Set(S.tiendas.map(t => t.zona))];
+  document.getElementById("zonas").innerHTML = zs.map(z => `<span class="chip ${z === zona ? "on" : ""}" data-z="${esc(z)}">${esc(z)}</span>`).join("");
+  document.querySelectorAll(".chip").forEach(c => c.onclick = () => { zona = c.dataset.z; cabecera(); pintar(); ajustar(); });
+}
+
+function ajustar() {
+  const v = visibles(); if (v.length) map.fitBounds(L.latLngBounds(v.map(t => [t.lat, t.lon])).pad(.15), { maxZoom: 12 });
+}
+
+fetch("data/status.json?" + Date.now()).then(r => r.json()).then(d => {
+  S = d; cabecera(); pintar(); pintarSismos(); ajustar();
+  document.getElementById("q").oninput = e => { texto = e.target.value; pintar(); };
+}).catch(() => { document.getElementById("meta").textContent = "No se pudo cargar los datos. Intenta de nuevo en unos minutos."; });
+</script>
+</body>
+</html>

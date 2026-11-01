@@ -1,0 +1,33 @@
+id,nombre,zona,region,ciudad,consulta,confianza
+jockey-plaza,Falabella Jockey Plaza,Lima y Callao,Lima,Santiago de Surco,"Jockey Plaza, Av. Javier Prado Este 4200, Santiago de Surco, Lima",alta
+megaplaza,Falabella Megaplaza,Lima y Callao,Lima,Independencia,"Megaplaza, Av. Industrial 3515, Independencia, Lima",alta
+plaza-norte,Falabella Plaza Norte,Lima y Callao,Lima,Independencia,"Plaza Norte, Independencia, Lima",media
+san-miguel,Falabella San Miguel,Lima y Callao,Lima,San Miguel,"Plaza San Miguel, Av. La Marina 2100, San Miguel, Lima",alta
+salaverry,Falabella Salaverry,Lima y Callao,Lima,Jesús María,"Real Plaza Salaverry, Av. Felipe Salaverry 2370, Jesús María, Lima",alta
+centro-civico,Falabella Centro Cívico,Lima y Callao,Lima,Cercado de Lima,"Real Plaza Centro Cívico, Av. Inca Garcilaso de la Vega 1337, Lima",alta
+miraflores,Falabella Miraflores,Lima y Callao,Lima,Miraflores,"Av. Arequipa 5280, Miraflores, Lima",alta
+san-isidro,Falabella San Isidro,Lima y Callao,Lima,San Isidro,"Av. Paseo de la República 3220, San Isidro, Lima",alta
+angamos,Falabella Angamos,Lima y Callao,Lima,Surquillo,"Av. Angamos Este 1803, Surquillo, Lima",alta
+mall-del-sur,Falabella Mall del Sur,Lima y Callao,Lima,San Juan de Miraflores,"Mall del Sur, Av. Los Lirios 301, San Juan de Miraflores, Lima",alta
+atocongo,Falabella Atocongo,Lima y Callao,Lima,San Juan de Miraflores,"Open Plaza Atocongo, San Juan de Miraflores, Lima",media
+puruchuco,Falabella Puruchuco,Lima y Callao,Lima,Ate,"Real Plaza Puruchuco, Av. Nicolás Ayllón 4770, Ate, Lima",alta
+santa-anita,Falabella Santa Anita,Lima y Callao,Lima,Santa Anita,"Mall Aventura Santa Anita, Lima",media
+bellavista,Falabella Bellavista,Lima y Callao,Callao,Bellavista,"Mall Aventura Plaza Bellavista, Callao",media
+comas,Falabella Comas,Lima y Callao,Lima,Comas,"Mallplaza Comas, Lima",media
+lima-centro,Falabella Lima Centro,Lima y Callao,Lima,Cercado de Lima,"Jirón de la Unión, Cercado de Lima",media
+canete,Falabella Cañete,Lima y Callao,Lima,San Vicente de Cañete,"Megaplaza Cañete, Cañete",media
+piura-centro,Falabella Piura Centro,Costa norte,Piura,Piura,"Jirón Arequipa 802, Piura",alta
+piura-mall,Falabella Piura Mall,Costa norte,Piura,Castilla,"Open Plaza Piura, Av. Andrés Avelino Cáceres 147, Castilla, Piura",alta
+chiclayo,Falabella Chiclayo,Costa norte,Lambayeque,Chiclayo,"Real Plaza Chiclayo, Calle Miguel de Cervantes 300, Chiclayo",alta
+trujillo,Falabella Trujillo,Costa norte,La Libertad,Trujillo,"Mall Aventura Trujillo, Av. Mansiche, Trujillo",alta
+chimbote,Falabella Chimbote,Costa norte,Áncash,Chimbote,"Mega Plaza Chimbote, Chimbote",media
+ica,Falabella Ica,Costa sur,Ica,Ica,"Mall Plaza Ica, Ica",media
+arequipa-cayma,Falabella Arequipa Cayma,Costa sur,Arequipa,Cayma,"Av. Ejército 793, Cayma, Arequipa",alta
+arequipa-porongoche,Falabella Arequipa Porongoche,Costa sur,Arequipa,Paucarpata,"Mall Aventura Porongoche, Av. Porongoche 502, Paucarpata, Arequipa",alta
+tacna,Falabella Tacna,Costa sur,Tacna,Tacna,"Open Plaza Tacna, Tacna",media
+cusco,Falabella Cusco,Sierra y centro,Cusco,Cusco,"Real Plaza Cusco, Av. de la Cultura, Cusco",media
+huancayo,Falabella Huancayo,Sierra y centro,Junín,Huancayo,"Open Plaza Huancayo, Huancayo",media
+huanuco,Falabella Huánuco,Sierra y centro,Huánuco,Huánuco,"Open Plaza Huánuco, Huánuco",media
+cajamarca,Falabella Cajamarca,Sierra y centro,Cajamarca,Cajamarca,"Quinde Shopping Plaza, Cajamarca",media
+iquitos,Falabella Iquitos,Selva,Loreto,Iquitos,"Mall Aventura Iquitos, Iquitos",media
+pucallpa,Falabella Pucallpa,Selva,Ucayali,Pucallpa,"Open Plaza Pucallpa, Pucallpa",media
